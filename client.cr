@@ -23,7 +23,7 @@ struct JsonSocket
         end
       end
     rescue ex
-      puts ex.message
+      STDERR.puts ex.message
     end
   end
 end
