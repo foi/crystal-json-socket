@@ -1,21 +1,19 @@
-server = JsonSocketServer.new
-server.listen do |message, socket|
-  spawn do
-    # text = { :name => "111" }.to_json
-    # socket.puts "#{text.size}\##{text}\n"
-    # socket.close_write
-    server.send_end_message(socket, { :name => 222})
-  end
-end
+require "./spec_helper"
 
-
-
-to_server = JsonSocket.new("localhost", 1234)
-
-10000.times do
-
-  parsed = to_server.send({ :name => 1})
-  unless parsed.nil?
-    puts parsed["name"]
+describe "JSONSocket::Server, JSONSocket::Client" do
+  it "Server should receive and repond on messages and clinet should send and receive response from server" do
+    server = JSONSocket::Server.new("localhost", 1234)
+    spawn do
+      server.listen do |message, socket|
+        message["test"].should eq(1)
+        server.send_end_message(socket, { :status => "success" })
+        server.stop
+      end
+    end
+    to_server = JSONSocket::Client.new("localhost", 1234)
+    result = to_server.send({ :test => 1 })
+    if result
+      result["status"].should eq("success")
+    end
   end
 end

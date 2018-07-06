@@ -1,7 +1,7 @@
 require "socket"
 require "json"
 
-struct Server
+struct JsonSocketServer
   property host
   property port
   property delimeter
@@ -18,7 +18,12 @@ struct Server
     socket.close_write
   end
 
+  def stop
+    @server.close
+  end
+
   def listen
+    puts "listen..."
     loop do
       if socket = @server.accept?
         tmp = socket.gets
@@ -30,11 +35,13 @@ struct Server
               length = @buffer[0..(delimeter_index - 1)].to_i
               range = (delimeter_index + 1)..(delimeter_index + length)
               message = @buffer[range]
+              p "buffer #{@buffer}, buffer.size #{@buffer.size}, range #{range}, length: #{length}"
               @buffer = if @buffer.size == (length + range.begin)
                           ""
                         else
                           @buffer[(delimeter_index + length)..(@buffer.size + 1)]
                         end
+              p "Buffer: #{@buffer}, Message: #{message}"
               yield message, socket
             end
           end

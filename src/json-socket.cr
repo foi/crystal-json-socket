@@ -34,8 +34,10 @@ module JSONSocket
     property port
     property delimeter
     property buffer
+    property stop
 
     def initialize(@host : String = "localhost", @port : Int32 = 1234, @delimeter : String = "#")
+      @stop = false
       @server = TCPServer.new(@host, @port)
       @buffer = String.new
     end
@@ -46,8 +48,13 @@ module JSONSocket
       socket.close_write
     end
 
+    def stop
+      @stop = true
+    end
+
     def listen
       loop do
+        break if @stop
         if socket = @server.accept?
           tmp = socket.gets
           if tmp
@@ -63,14 +70,16 @@ module JSONSocket
                           else
                             @buffer[(delimeter_index + length)..(@buffer.size + 1)]
                           end
-                yield message, socket
+                yield JSON.parse(message), socket
               end
             end
           end
         else
           break
         end
+
       end
     end
   end
+
 end
