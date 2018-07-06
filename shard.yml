@@ -5,7 +5,6 @@ authors:
   - foi <foi@live.ru>
 
 description: |
-  JSON-socket client & server implementation. Inspired by and 
-compatible with sebastianseilund/node-json-socket 
+  JSON-socket client & server implementation. Inspired by and compatible with sebastianseilund/node-json-socket
 
 license: MIT
