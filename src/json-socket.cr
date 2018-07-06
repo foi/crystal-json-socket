@@ -55,10 +55,10 @@ module JSONSocket
     def listen
       loop do
         break if @stop
-        if socket = @server.accept?
+        @server.accept do |socket|
           tmp = socket.gets
           if tmp
-            @buffer = @buffer + tmp
+            @buffer = "#{@buffer}#{tmp}"
             while !@buffer.index(@delimeter).nil?
               delimeter_index = @buffer.index(@delimeter)
               if delimeter_index
@@ -74,10 +74,7 @@ module JSONSocket
               end
             end
           end
-        else
-          break
         end
-
       end
     end
   end
