@@ -1,7 +1,7 @@
 require "socket"
 require "json"
 
-struct JsonSocket
+struct Client
   property host
   property port
   property delimeter
@@ -23,18 +23,7 @@ struct JsonSocket
         end
       end
     rescue ex
-      STDERR.puts ex.message
+      puts ex.message
     end
-  end
-end
-
-
-to_server = JsonSocket.new("localhost", 1234)
-
-10000.times do
-
-  parsed = to_server.send({ :name => 1})
-  unless parsed.nil?
-    puts parsed["name"]
   end
 end
