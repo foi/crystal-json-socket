@@ -16,7 +16,7 @@ dependencies:
 server.cr
 ```
 require "json-socket"
-server = JSONSocket::Server.new("localhost", 1234)
+server = JSONSocket::Server.new("localhost", 1234) # OR JSONSocket::Server.new(unix_socket: "/tmp/json-socket-server.sock", delimeter: "µ")
 server.listen do |message, socket|
   puts message # JSON::Any # => { "test" => 1 }
   spawn server.send_end_message(socket, { :status => "success" })
@@ -25,7 +25,7 @@ end
   client.cr
 ```
 require "json-socket"
-to_server = JSONSocket::Client.new("localhost", 1234)
+to_server = JSONSocket::Client.new("localhost", 1234) # OR JSONSocket::Client.new(unix_socket: "/tmp/json-socket-server.sock", delimeter: "µ")
 result = to_server.send({ :test => 1 })
 if result
   puts result["status"] # success

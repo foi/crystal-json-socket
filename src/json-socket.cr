@@ -1,45 +1,62 @@
 require "socket"
 require "json"
+require "file_utils"
 
 module JSONSocket
   struct Client
-    property host
-    property port
-    property delimeter
+    property delimeter : String
+    property host : String
+    property port : Int32
 
-    def initialize(@host : String, @port : Int32, @delimeter : String = "#")
+    def initialize(host = "localhost", port = 1234, delimeter = "#", unix_socket : String? = nil)
+      @host = host
+      @port = port
+      @unix_socket = unix_socket
+      @delimeter = delimeter
     end
 
     def send(object)
       begin
-        TCPSocket.open(@host, @port) do |socket|
-          stringified = object.to_json
-          socket << "#{stringified.size}#{delimeter}#{stringified}\n"
-          response = socket.gets
-          unless response.nil?
-            parts = response.split(@delimeter)
-            return JSON.parse(parts[1])
-          else
-            raise "failed while receiving response!"
+        if @unix_socket
+          UNIXSocket.open(@unix_socket.as(String)) do |socket|
+            handle_send_receive(socket, object)
+          end
+        else
+          TCPSocket.open(@host, @port) do |socket|
+            handle_send_receive(socket, object)
           end
         end
       rescue ex
         puts ex.message
       end
     end
+
+    def handle_send_receive(socket, object)
+      stringified = object.to_json
+      socket << "#{stringified.size}#{delimeter}#{stringified}\n"
+      response = socket.gets
+      unless response.nil?
+        parts = response.split(@delimeter)
+        return JSON.parse(parts[1])
+      else
+        raise "failed while receiving response!"
+      end
+    end
   end
 
   struct Server
-    property host
-    property port
     property delimeter
-    property buffer
-    property stop
+    property buffer = String.new
+    property stop = false
 
-    def initialize(@host : String = "localhost", @port : Int32 = 1234, @delimeter : String = "#")
-      @stop = false
-      @server = TCPServer.new(@host, @port)
-      @buffer = String.new
+    def initialize(host : String = "localhost", port : Int32 = 1234, delimeter : String = "#", unix_socket = nil)
+      @delimeter = delimeter
+      @server = if unix_socket
+                  FileUtils.rm(unix_socket.as(String))
+                  UNIXServer.new(unix_socket)
+                else
+                  TCPServer.new(host, port)
+                end
     end
 
     def send_end_message(socket, message)
