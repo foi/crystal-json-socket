@@ -1,4 +1,5 @@
 language: crystal
 sudo: true
 env:
-  - TMPDIR=/run
+  global:
+    - TMPDIR=/tmp
