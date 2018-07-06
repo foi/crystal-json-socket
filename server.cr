@@ -12,6 +12,12 @@ struct JsonSocketServer
     @buffer = String.new
   end
 
+  def send_end_message(socket, message)
+    string = message.to_json
+    socket.puts "#{string.size}#{@delimeter}#{string}\n"
+    socket.close_write
+  end
+
   def listen
     puts "listen..."
     loop do
@@ -46,8 +52,9 @@ end
 server = JsonSocketServer.new
 server.listen do |message, socket|
   spawn do
-    text = { :name => "111" }.to_json
-    socket.puts "#{text.size}\##{text}\n"
-    socket.close_write
+    # text = { :name => "111" }.to_json
+    # socket.puts "#{text.size}\##{text}\n"
+    # socket.close_write
+    server.send_end_message(socket, { :name => 222})
   end
 end
