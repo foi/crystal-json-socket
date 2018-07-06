@@ -5,57 +5,49 @@ struct JsonSocketServer
   property host
   property port
   property delimeter
+  property buffer
 
-  def initialize(@host : String = "localhost", @port : Int16 = 1234, @delimeter : String = "#")
+  def initialize(@host : String = "localhost", @port : Int32 = 1234, @delimeter : String = "#")
     @server = TCPServer.new(@host, @port)
+    @buffer = String.new
   end
 
   def listen
+    puts "listen..."
     loop do
       if socket = @server.accept?
-        yield socket
+        tmp = socket.gets
+        if tmp
+          @buffer = @buffer + tmp
+          while !@buffer.index(@delimeter).nil?
+            delimeter_index = @buffer.index(@delimeter)
+            if delimeter_index
+              length = @buffer[0..(delimeter_index - 1)].to_i
+              range = (delimeter_index + 1)..(delimeter_index + length)
+              message = @buffer[range]
+              p "buffer #{@buffer}, buffer.size #{@buffer.size}, range #{range}, length: #{length}"
+              @buffer = if @buffer.size == (length + range.begin)
+                          ""
+                        else
+                          @buffer[(delimeter_index + length)..(@buffer.size + 1)]
+                        end
+              p "Buffer: #{@buffer}, Message: #{message}"
+              yield message, socket
+            end
+          end
+        end
       else
         break
       end
     end
   end
-
 end
 
 server = JsonSocketServer.new
-server.listen do |socket|
+server.listen do |message, socket|
   spawn do
+    text = { :name => "111" }.to_json
+    socket.puts "#{text.size}\##{text}\n"
     socket.close_write
   end
 end
-
-# DELIMITER = "#"
-#
-# def handle_client(client)
-#   message = client.gets
-#   if message
-#     puts 1
-#     puts message.split(DELIMITER)
-#     puts message.size
-#     delimiter_index = message.index(DELIMITER)
-#     if delimiter_index
-#       length = message[0..(delimiter_index - 1)].to_i
-#       range = (delimiter_index + 1)..(delimiter_index + length)
-#       puts length
-#       puts message[range]
-#     end
-#     client.puts message
-#     client.close_write
-#   end
-# end
-#
-# server = TCPServer.new("localhost", 1234)
-# loop do
-#   if socket = server.accept?
-#     # handle the client in a fiber
-#     spawn handle_client(socket)
-#   else
-#     # another fiber closed the server
-#     break
-#   end
-# end
