@@ -52,7 +52,7 @@ module JSONSocket
     def initialize(host : String = "localhost", port : Int32 = 1234, delimeter : String = "#", unix_socket = nil)
       @delimeter = delimeter
       @server = if unix_socket
-                  FileUtils.rm(unix_socket.as(String))
+                  FileUtils.rm(unix_socket.as(String)) if File.exists?(unix_socket.as(String))
                   UNIXServer.new(unix_socket)
                 else
                   TCPServer.new(host, port)

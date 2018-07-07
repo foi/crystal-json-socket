@@ -1,10 +1,1 @@
 language: crystal
-
-sudo: true
-
-env:
-  global:
-    - TMPDIR=$TRAVIS_BUILD_DIR/tmp
-
-before_install:
-  - mkdir -p $TRAVIS_BUILD_DIR/tmp

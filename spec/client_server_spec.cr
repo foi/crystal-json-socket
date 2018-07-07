@@ -17,7 +17,7 @@ describe "JSONSocket::Server, JSONSocket::Client" do
     end
   end
   it "Send & receive via unix_socket" do
-    server = JSONSocket::Server.new(unix_socket: "/tmp/json-socket-server.sock")
+    server = JSONSocket::Server.new(unix_socket: "./json-socket-server.sock")
     spawn do
       server.listen do |message, socket|
         message["test"].should eq(1)
@@ -25,14 +25,14 @@ describe "JSONSocket::Server, JSONSocket::Client" do
         server.stop
       end
     end
-    to_server = JSONSocket::Client.new(unix_socket: "/tmp/json-socket-server.sock")
+    to_server = JSONSocket::Client.new(unix_socket: "./json-socket-server.sock")
     result = to_server.send({ :test => 1 })
     if result
       result["status"].should eq("success")
     end
   end
   it "Send & receive via unix_socket with custom delimeter like µ" do
-    server = JSONSocket::Server.new(unix_socket: "/tmp/json-socket-server.sock", delimeter: "µ")
+    server = JSONSocket::Server.new(unix_socket: "./json-socket-server.sock", delimeter: "µ")
     spawn do
       server.listen do |message, socket|
         message["test"].should eq(1)
@@ -40,7 +40,7 @@ describe "JSONSocket::Server, JSONSocket::Client" do
         server.stop
       end
     end
-    to_server = JSONSocket::Client.new(unix_socket: "/tmp/json-socket-server.sock", delimeter: "µ")
+    to_server = JSONSocket::Client.new(unix_socket: "./json-socket-server.sock", delimeter: "µ")
     result = to_server.send({ :test => 1 })
     if result
       result["status"].should eq("success")
