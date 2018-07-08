@@ -52,7 +52,6 @@ module JSONSocket
                   TCPServer.new(host, port)
                 end
       @stop = false
-      @buffer = String.new
     end
 
     def send_end_message(socket, message)
