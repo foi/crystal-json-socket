@@ -19,7 +19,7 @@ require "json-socket"
 server = JSONSocket::Server.new("localhost", 1234) # OR JSONSocket::Server.new(unix_socket: "/tmp/json-socket-server.sock", delimeter: "µ")
 server.listen do |message, socket|
   puts message # JSON::Any # => { "test" => 1 }
-  spawn server.send_end_message(socket, { :status => "success" })
+  server.send_end_message(socket, { :status => "success" })
 end
 ```
   client.cr
