@@ -91,22 +91,12 @@ module JSONSocket
 
     def handle_socket(socket)
       if socket
-        tmp = @node_json_socket_compatibility ? socket.gets("}") : socket.gets
-        if tmp
-          while !tmp.index(@delimeter).nil?
-            delimeter_index = tmp.index(@delimeter)
-            if delimeter_index
-              length = tmp[0..(delimeter_index - 1)].to_i
-              range = (delimeter_index + 1)..(delimeter_index + length)
-              message = tmp[range]
-              tmp = ""
-              begin
-                on_message(JSON.parse(message), socket)
-              rescue ex
-                STDERR.puts ex.message
-              end
-            end
-          end
+        message_size = socket.gets(@delimeter).not_nil!.split(@delimeter).first.to_i
+        message = socket.read_string(message_size)
+        begin
+          on_message(JSON.parse(message), socket)
+        rescue ex
+          STDERR.puts ex.message
         end
       end
     end
