@@ -1,6 +1,6 @@
 # crystal json-socket [![Build Status](https://travis-ci.org/foi/crystal-json-socket.svg?branch=master)](https://travis-ci.org/foi/crystal-json-socket)
 
-JSON-socket client & server implementation. Inspired by and compatible with [sebastianseilund/node-json-socket](https://github.com/sebastianseilund/node-json-socket/)
+JSON-socket client & server implementation. Inspired by and wish for compatability with  [sebastianseilund/node-json-socket](https://github.com/sebastianseilund/node-json-socket/)
 
 ## Installation
 

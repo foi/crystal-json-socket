@@ -78,11 +78,7 @@ module JSONSocket
                   length = tmp[0..(delimeter_index - 1)].to_i
                   range = (delimeter_index + 1)..(delimeter_index + length)
                   message = tmp[range]
-                  tmp = if tmp.size == (length + range.begin)
-                          ""
-                        else
-                          tmp[(delimeter_index + length)..(tmp.size + 1)]
-                        end
+                  tmp = ""
                   yield JSON.parse(message), socket
                 end
               end
