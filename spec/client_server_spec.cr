@@ -14,8 +14,18 @@ struct CustomCyrillicJSONSocketServer
   include JSONSocket::Server
 
   def on_message(message, socket)
-    message["hello"].should eq("Пшел нахуй")
-    self.send_end_message(socket, { :hi => "сука иди сюда" })
+    message["hello"].should eq("привет")
+    self.send_end_message(socket, { :hi => "и тебе привет" })
+    @stop = true
+  end
+end
+
+struct CustomUnicodeJSONSocketServer
+  include JSONSocket::Server
+
+  def on_message(message, socket)
+    message["hello"].should eq("ƣŲ21Ɣ")
+    self.send_end_message(socket, { :hi => "ŤŢ32Ɓ" })
     @stop = true
   end
 end
@@ -61,9 +71,18 @@ describe "JSONSocket::Server, JSONSocket::Client" do
     server = CustomCyrillicJSONSocketServer.new(unix_socket: "./tmp.sock", delimeter: "µ")
     spawn server.listen
     to_server = JSONSocket::Client.new(unix_socket: "./tmp.sock", delimeter: "µ")
-    result = to_server.send({ :hello => "Пшел нахуй" })
+    result = to_server.send({ :hello => "привет" })
     if result
-      result["hi"].should eq("сука иди сюда")
+      result["hi"].should eq("и тебе привет")
+    end
+  end
+  it "Send & receive via unix_socket with custom delimeter & unicode message" do
+    server = CustomUnicodeJSONSocketServer.new(unix_socket: "./tmp.sock", delimeter: "µ")
+    spawn server.listen
+    to_server = JSONSocket::Client.new(unix_socket: "./tmp.sock", delimeter: "µ")
+    result = to_server.send({ :hello => "ƣŲ21Ɣ" })
+    if result
+      result["hi"].should eq("ŤŢ32Ɓ")
     end
   end
 end

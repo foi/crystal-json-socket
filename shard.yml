@@ -1,10 +1,10 @@
 name: json-socket
-version: 0.9.0
+version: 1.0.0
 
 authors:
   - foi <foi@live.ru>
 
 description: |
-  JSON-socket client & server implementation. Inspired by and wish for compatability with sebastianseilund/node-json-socket
+  JSON-socket client & server implementation. Inspired by and compatible with sebastianseilund/node-json-socket
 
 license: MIT

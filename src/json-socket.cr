@@ -30,7 +30,7 @@ module JSONSocket
 
     def handle_send_receive(socket, object)
       stringified = object.to_json
-      socket << "#{stringified.size}#{@delimeter}#{stringified}\n"
+      socket << "#{stringified.bytesize}#{@delimeter}#{stringified}\n"
       response = socket.gets
       unless response.nil?
         parts = response.split(@delimeter)
@@ -82,9 +82,7 @@ module JSONSocket
            "  def on_message(message, socket) \n" \
            "    puts message \n" \
            "    response = { :status => \"OK\"}.to_json \n" \
-           "    socket.puts \"\#{response.size}\#{@delimeter}\#{response}\" \n" \
-           "  ensure \n" \
-           "    socket.close \n" \
+           "    self.send_end_message(socket, { :hello => 892 } ) \n" \
            "  end \n" \
            "end \n"
     end
