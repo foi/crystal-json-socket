@@ -1,6 +1,6 @@
 # crystal json-socket [![Build Status](https://travis-ci.org/foi/crystal-json-socket.svg?branch=master)](https://travis-ci.org/foi/crystal-json-socket)
 
-JSON-socket client & server implementation. Inspired by and wish for compatability with  [sebastianseilund/node-json-socket](https://github.com/sebastianseilund/node-json-socket/)
+JSON-socket client & server implementation. Inspired by and wish for compatibility with  [sebastianseilund/node-json-socket](https://github.com/sebastianseilund/node-json-socket/)
 
 ## Installation
 
@@ -44,3 +44,5 @@ if (result)
   puts result
 end
 ```
+
+#### NOTE: node-json-socket support in limited because crystal's socket.gets is not receiving messaged without \n at the end. For activating this limited support you need set node_json_socket_compatibility: true when creating server (.new)

@@ -24,7 +24,7 @@ module JSONSocket
           end
         end
       rescue ex
-        puts ex.message
+        STDERR.puts ex.message
       end
     end
 
@@ -43,7 +43,7 @@ module JSONSocket
 
   module Server
 
-    def initialize(host : String = "localhost", port : Int32 = 1234, delimeter : String = "#", unix_socket = nil)
+    def initialize(host : String = "localhost", port : Int32 = 1234, delimeter : String = "#", unix_socket = nil, node_json_socket_compatibility = false)
       @delimeter = delimeter
       @server = if unix_socket
                   FileUtils.rm(unix_socket.as(String)) if File.exists?(unix_socket.as(String))
@@ -52,6 +52,7 @@ module JSONSocket
                   TCPServer.new(host, port)
                 end
       @stop = false
+      @node_json_socket_compatibility = node_json_socket_compatibility
     end
 
     def send_end_message(socket, message)
@@ -90,7 +91,7 @@ module JSONSocket
 
     def handle_socket(socket)
       if socket
-        tmp = socket.gets
+        tmp = @node_json_socket_compatibility ? socket.gets("}") : socket.gets
         if tmp
           while !tmp.index(@delimeter).nil?
             delimeter_index = tmp.index(@delimeter)
