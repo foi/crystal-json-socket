@@ -3,7 +3,7 @@ require "json"
 require "file_utils"
 
 module JSONSocket
-  struct Client
+  class Client
 
     def initialize(host = "localhost", port = 1234, delimeter = "#", unix_socket : String? = nil)
       @host = host
@@ -41,7 +41,7 @@ module JSONSocket
     end
   end
 
-  struct Server
+  module Server
 
     def initialize(host : String = "localhost", port : Int32 = 1234, delimeter : String = "#", unix_socket = nil)
       @delimeter = delimeter
@@ -67,19 +67,42 @@ module JSONSocket
     def listen
       loop do
         break if @stop
-        @server.accept? do |socket|
-          if socket
-            tmp = socket.gets
-            if tmp
-              while !tmp.index(@delimeter).nil?
-                delimeter_index = tmp.index(@delimeter)
-                if delimeter_index
-                  length = tmp[0..(delimeter_index - 1)].to_i
-                  range = (delimeter_index + 1)..(delimeter_index + length)
-                  message = tmp[range]
-                  tmp = ""
-                  yield JSON.parse(message), socket
-                end
+        while client = @server.accept?
+          spawn handle_socket(client)
+        end
+      end
+    end
+
+    def on_message(message, socket)
+      puts "Default on_message methods - please override, like this: \n" \
+           "class CustomJSONSocketServer \n" \
+           "  include JSONSocket::Server \n" \
+           " \n" \
+           "  def on_message(message, socket) \n" \
+           "    puts message \n" \
+           "    response = { :status => \"OK\"}.to_json \n" \
+           "    socket.puts \"\#{response.size}\#{@delimeter}\#{response}\" \n" \
+           "  ensure \n" \
+           "    socket.close \n" \
+           "  end \n" \
+           "end \n"
+    end
+
+    def handle_socket(socket)
+      if socket
+        tmp = socket.gets
+        if tmp
+          while !tmp.index(@delimeter).nil?
+            delimeter_index = tmp.index(@delimeter)
+            if delimeter_index
+              length = tmp[0..(delimeter_index - 1)].to_i
+              range = (delimeter_index + 1)..(delimeter_index + length)
+              message = tmp[range]
+              tmp = ""
+              begin
+                on_message(JSON.parse(message), socket)
+              rescue ex
+                STDERR.puts ex.message
               end
             end
           end
