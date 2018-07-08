@@ -57,7 +57,7 @@ module JSONSocket
 
     def send_end_message(socket, message)
       string = message.to_json
-      socket.puts "#{string.size}#{@delimeter}#{string}\n"
+      socket.puts "#{string.size}#{@delimeter}#{string}"
       socket.close_write
     end
 
@@ -89,7 +89,7 @@ module JSONSocket
 
     def handle_socket(socket)
       if socket
-        message_size = socket.gets(@delimeter).not_nil!.split(@delimeter).first.to_i
+        message_size = socket.gets(@delimeter).not_nil!.delete(@delimeter).to_i
         message = socket.read_string(message_size)
         begin
           on_message(JSON.parse(message), socket)
