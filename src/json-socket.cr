@@ -4,9 +4,6 @@ require "file_utils"
 
 module JSONSocket
   struct Client
-    property delimeter : String
-    property host : String
-    property port : Int32
 
     def initialize(host = "localhost", port = 1234, delimeter = "#", unix_socket : String? = nil)
       @host = host
@@ -33,7 +30,7 @@ module JSONSocket
 
     def handle_send_receive(socket, object)
       stringified = object.to_json
-      socket << "#{stringified.size}#{delimeter}#{stringified}\n"
+      socket << "#{stringified.size}#{@delimeter}#{stringified}\n"
       response = socket.gets
       unless response.nil?
         parts = response.split(@delimeter)
@@ -45,9 +42,6 @@ module JSONSocket
   end
 
   struct Server
-    property delimeter
-    property buffer = String.new
-    property stop = false
 
     def initialize(host : String = "localhost", port : Int32 = 1234, delimeter : String = "#", unix_socket = nil)
       @delimeter = delimeter
@@ -57,6 +51,8 @@ module JSONSocket
                 else
                   TCPServer.new(host, port)
                 end
+      @buffer = String.new
+      @stop = false
     end
 
     def send_end_message(socket, message)
