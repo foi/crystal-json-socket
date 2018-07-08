@@ -51,8 +51,8 @@ module JSONSocket
                 else
                   TCPServer.new(host, port)
                 end
-      @buffer = String.new
       @stop = false
+      @buffer = String.new
     end
 
     def send_end_message(socket, message)
@@ -68,28 +68,30 @@ module JSONSocket
     def listen
       loop do
         break if @stop
-        @server.accept do |socket|
-          tmp = socket.gets
-          if tmp
-            @buffer = "#{@buffer}#{tmp}"
-            while !@buffer.index(@delimeter).nil?
-              delimeter_index = @buffer.index(@delimeter)
-              if delimeter_index
-                length = @buffer[0..(delimeter_index - 1)].to_i
-                range = (delimeter_index + 1)..(delimeter_index + length)
-                message = @buffer[range]
-                @buffer = if @buffer.size == (length + range.begin)
-                            ""
-                          else
-                            @buffer[(delimeter_index + length)..(@buffer.size + 1)]
-                          end
-                yield JSON.parse(message), socket
+        @server.accept? do |socket|
+          if socket
+            tmp = socket.gets
+            if tmp
+              while !tmp.index(@delimeter).nil?
+                delimeter_index = tmp.index(@delimeter)
+                if delimeter_index
+                  length = tmp[0..(delimeter_index - 1)].to_i
+                  range = (delimeter_index + 1)..(delimeter_index + length)
+                  message = tmp[range]
+                  tmp = if tmp.size == (length + range.begin)
+                          ""
+                        else
+                          tmp[(delimeter_index + length)..(tmp.size + 1)]
+                        end
+                  yield JSON.parse(message), socket
+                end
               end
             end
           end
         end
       end
     end
+
   end
 
 end
