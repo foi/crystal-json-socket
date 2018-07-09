@@ -6,7 +6,7 @@ for (let i = 0; i < 10000; i++) {
     if (err) {
       console.error(err)
     }
-    console.log(message);
+    console.log(i);
     if (i === 9999) {
       console.log('Elapsed time: ', new Date() - startTime)
     }
