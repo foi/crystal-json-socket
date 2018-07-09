@@ -5,7 +5,7 @@ struct CustomJSONSocketServer
 
   def on_message(message, socket)
     message["test"].should eq(1)
-    self.send_end_message(socket, { :status => "OK" })
+    self.send_end_message({ :status => "OK" }, socket)
     @stop = true
   end
 end
@@ -15,7 +15,7 @@ struct CustomCyrillicJSONSocketServer
 
   def on_message(message, socket)
     message["hello"].should eq("привет")
-    self.send_end_message(socket, { :hi => "и тебе привет" })
+    self.send_end_message({ :hi => "и тебе привет" }, socket)
     @stop = true
   end
 end
@@ -25,7 +25,7 @@ struct CustomUnicodeJSONSocketServer
 
   def on_message(message, socket)
     message["hello"].should eq("ƣŲ21Ɣ")
-    self.send_end_message(socket, { :hi => "ŤŢ32Ɓ" })
+    self.send_end_message({ :hi => "ŤŢ32Ɓ" }, socket)
     @stop = true
   end
 end

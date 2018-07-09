@@ -43,7 +43,7 @@ module JSONSocket
 
   module Server
 
-    def initialize(host : String = "localhost", port : Int32 = 1234, delimeter : String = "#", unix_socket = nil, node_json_socket_compatibility = false)
+    def initialize(host : String = "localhost", port : Int32 = 1234, delimeter : String = "#", unix_socket = nil)
       @delimeter = delimeter
       @server = if unix_socket
                   FileUtils.rm(unix_socket.as(String)) if File.exists?(unix_socket.as(String))
@@ -52,10 +52,9 @@ module JSONSocket
                   TCPServer.new(host, port)
                 end
       @stop = false
-      @node_json_socket_compatibility = node_json_socket_compatibility
     end
 
-    def send_end_message(socket, message)
+    def send_end_message(message, socket)
       string = message.to_json
       socket.puts "#{string.size}#{@delimeter}#{string}"
       socket.close_write
@@ -82,7 +81,7 @@ module JSONSocket
            "  def on_message(message, socket) \n" \
            "    puts message \n" \
            "    response = { :status => \"OK\"}.to_json \n" \
-           "    self.send_end_message(socket, { :hello => 892 } ) \n" \
+           "    self.send_end_message({ :hello => 892 }, socket) \n" \
            "  end \n" \
            "end \n"
     end

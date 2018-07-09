@@ -25,7 +25,7 @@ struct CustomJSONSocketServer
   def on_message(message, socket)
     puts message
     result = (message["a"].as_i + message["b"].as_i) * message["b"].as_i * message["a"].as_i
-    self.send_end_message(socket, { :result => result})
+    self.send_end_message({ :result => result}, socket)
   end
 
 end
