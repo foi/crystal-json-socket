@@ -6,7 +6,7 @@ JSON-socket client & server implementation. Inspired by and compatible with  [se
 ## Installation
 
 Add this to your application's `shard.yml`:
-```
+```yaml
 dependencies:
   json-socket:
     github: foi/crystal-json-socket
