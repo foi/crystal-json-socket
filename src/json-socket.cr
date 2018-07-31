@@ -4,7 +4,6 @@ require "file_utils"
 
 module JSONSocket
   class Client
-
     def initialize(host = "localhost", port = 1234, delimeter = "#", unix_socket : String? = nil)
       @host = host
       @port = port
@@ -13,26 +12,24 @@ module JSONSocket
     end
 
     def send(object)
-      begin
-        if @unix_socket
-          UNIXSocket.open(@unix_socket.as(String)) do |socket|
-            handle_send_receive(socket, object)
-          end
-        else
-          TCPSocket.open(@host, @port) do |socket|
-            handle_send_receive(socket, object)
-          end
+      if @unix_socket
+        UNIXSocket.open(@unix_socket.as(String)) do |socket|
+          handle_send_receive(socket, object)
         end
-      rescue ex
-        STDERR.puts ex.message
+      else
+        TCPSocket.open(@host, @port) do |socket|
+          handle_send_receive(socket, object)
+        end
       end
+    rescue ex
+      STDERR.puts ex.message
     end
 
     def handle_send_receive(socket, object)
       stringified = object.to_json
       socket << "#{stringified.bytesize}#{@delimeter}#{stringified}\n"
       response = socket.gets
-      unless response.nil?
+      if !response.nil?
         parts = response.split(@delimeter)
         return JSON.parse(parts[1])
       else
@@ -42,7 +39,6 @@ module JSONSocket
   end
 
   module Server
-
     def initialize(host : String = "localhost", port : Int32 = 1234, delimeter : String = "#", unix_socket = nil)
       @delimeter = delimeter
       @server = if unix_socket
@@ -97,7 +93,5 @@ module JSONSocket
         end
       end
     end
-
   end
-
 end

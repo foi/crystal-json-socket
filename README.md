@@ -1,6 +1,6 @@
 # crystal json-socket [![Build Status](https://travis-ci.org/foi/crystal-json-socket.svg?branch=master)](https://travis-ci.org/foi/crystal-json-socket)
 
-JSON-socket client & server implementation. Inspired by and compatible with  [sebastianseilund/node-json-socket](https://github.com/sebastianseilund/node-json-socket/) and 
+JSON-socket client & server implementation. Inspired by and compatible with  [sebastianseilund/node-json-socket](https://github.com/sebastianseilund/node-json-socket/) and
 [ruby json-socket](https://github.com/foi/ruby-json-socket)
 
 ## Installation
@@ -16,7 +16,7 @@ dependencies:
 
 server.cr
 
-```
+```crystal
 require "json-socket"
 
 struct CustomJSONSocketServer
@@ -37,7 +37,7 @@ server.listen
 
 client.cr
 
-```
+```crystal
 require "json-socket"
 to_server = JSONSocket::Client.new(host: "127.0.0.1", port: 1234) # OR JSONSocket::Client.new(unix_socket: "/tmp/json-socket-server.sock", delimeter: "µ")
 result = to_server.send({ a: 12, b: 8})
