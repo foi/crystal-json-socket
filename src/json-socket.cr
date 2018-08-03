@@ -35,6 +35,8 @@ module JSONSocket
       else
         raise "failed while receiving response!"
       end
+    ensure
+      socket.close
     end
   end
 
@@ -53,7 +55,8 @@ module JSONSocket
     def send_end_message(message, socket)
       string = message.to_json
       socket.puts "#{string.size}#{@delimeter}#{string}"
-      socket.close_write
+    ensure
+      socket.close
     end
 
     def stop
