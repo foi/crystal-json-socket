@@ -30,6 +30,15 @@ struct CustomUnicodeJSONSocketServer
   end
 end
 
+struct CustomJSONSocketServerNonStop
+  include JSONSocket::Server
+
+  def on_message(message, socket)
+    message["test"].should eq(1)
+    self.send_end_message({:status => "OK"}, socket)
+  end
+end
+
 describe "JSONSocket::Server, JSONSocket::Client" do
   it "Send & receive via tcp" do
     server = CustomJSONSocketServer.new("localhost", 1234)
@@ -84,5 +93,57 @@ describe "JSONSocket::Server, JSONSocket::Client" do
     if result
       result["hi"].should eq("ŤŢ32Ɓ")
     end
+  end
+
+  it "Stress-test via tcp" do
+    ch = Channel(String).new
+    server = CustomJSONSocketServerNonStop.new("localhost", 13345, "µ")
+    spawn server.listen
+    to_server = JSONSocket::Client.new("localhost", 13345, "µ")
+    start_time = Time.new
+    spawn do
+      100.times do
+        spawn do
+          result = to_server.send({:test => 1})
+          if result
+            ch.send result["status"].as_s
+          end
+        end
+      end
+    end
+    i = 0
+    100.times do
+      ok = ch.receive
+      i = i + 1
+    end
+    end_time = Time.new
+    puts "result: #{end_time - start_time}"
+    i.should eq(100)
+  end
+
+  it "Stress-test via unix_socket" do
+    ch = Channel(String).new
+    server = CustomJSONSocketServerNonStop.new(unix_socket: "./tmp-stress.sock", delimeter: "@")
+    spawn server.listen
+    to_server = JSONSocket::Client.new(unix_socket: "./tmp-stress.sock", delimeter: "@")
+    start_time = Time.new
+    spawn do
+      100.times do
+        spawn do
+          result = to_server.send({:test => 1})
+          if result
+            ch.send result["status"].as_s
+          end
+        end
+      end
+    end
+    i = 0
+    100.times do
+      ok = ch.receive
+      i = i + 1
+    end
+    end_time = Time.new
+    puts "result: #{end_time - start_time}"
+    i.should eq(100)
   end
 end
