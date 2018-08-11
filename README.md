@@ -45,3 +45,14 @@ if (result)
   puts result
 end
 ```
+
+client.cr with timeouts in seconds
+
+```crystal
+require "json-socket"
+to_server = JSONSocket::Client.new(host: "127.0.0.1", port: 1234, read_timeout: 10, write_timeout: 5) # OR JSONSocket::Client.new(unix_socket: "/tmp/json-socket-server.sock", delimeter: "µ", read_timeout: 10, write_timeout: 5)
+result = to_server.send({ a: 12, b: 8})
+if (result)
+  puts result
+end
+```

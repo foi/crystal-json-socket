@@ -39,6 +39,15 @@ struct CustomJSONSocketServerNonStop
   end
 end
 
+struct CustomSlowJSONSocketServer
+  include JSONSocket::Server
+
+  def on_message(message, socket)
+    sleep 2
+    self.send_end_message({:status => "OK"}, socket)
+  end
+end
+
 describe "JSONSocket::Server, JSONSocket::Client" do
   it "Send & receive via tcp" do
     server = CustomJSONSocketServer.new("localhost", 1234)
@@ -119,6 +128,24 @@ describe "JSONSocket::Server, JSONSocket::Client" do
     end_time = Time.new
     puts "result: #{end_time - start_time}"
     i.should eq(100)
+  end
+
+  it "read_timeout via tcp" do
+    server = CustomSlowJSONSocketServer.new(host: "localhost", port: 12245, delimeter: "µ")
+    spawn server.listen
+    to_server = JSONSocket::Client.new(host: "localhost", port: 12245, delimeter: "µ", read_timeout: 1)
+    expect_raises(IO::Timeout) do
+      result = to_server.send({:hello => "ƣŲ21Ɣ"})
+    end
+  end
+
+  it "read_timeout via unix_socket" do
+    server = CustomSlowJSONSocketServer.new(unix_socket: "./tmp-timeout.sock", delimeter: "µ")
+    spawn server.listen
+    to_server = JSONSocket::Client.new(unix_socket: "./tmp-timeout.sock", delimeter: "µ", read_timeout: 1)
+    expect_raises(IO::Timeout) do
+      result = to_server.send({:hello => "ƣŲ21Ɣ"})
+    end
   end
 
   it "Stress-test via unix_socket" do

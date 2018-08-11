@@ -4,36 +4,34 @@ require "file_utils"
 
 module JSONSocket
   class Client
-    def initialize(host = "localhost", port = 1234, delimeter = "#", unix_socket : String? = nil)
-      @host = host
-      @port = port
-      @unix_socket = unix_socket
-      @delimeter = delimeter
+    def initialize(@host = "localhost", @port = 1234, @delimeter = "#", @unix_socket : String? = nil, @read_timeout : Int8 = 5, @write_timeout : Int8 = 2)
     end
 
     def send(object)
       if @unix_socket
         UNIXSocket.open(@unix_socket.as(String)) do |socket|
+          socket.read_timeout = @read_timeout
+          socket.write_timeout = @write_timeout
           handle_send_receive(socket, object)
         end
       else
         TCPSocket.open(@host, @port) do |socket|
+          socket.read_timeout = @read_timeout
+          socket.write_timeout = @write_timeout
           handle_send_receive(socket, object)
         end
       end
-    rescue ex
-      STDERR.puts ex.message
     end
 
     def handle_send_receive(socket, object)
       stringified = object.to_json
-      socket << "#{stringified.bytesize}#{@delimeter}#{stringified}\n"
+      socket << "#{stringified.bytesize}#{@delimeter}#{stringified}"
       response = socket.gets
       if !response.nil?
         parts = response.split(@delimeter)
         return JSON.parse(parts[1])
       else
-        raise "failed while receiving response!"
+        raise "fail while receiving response!"
       end
     ensure
       socket.close
