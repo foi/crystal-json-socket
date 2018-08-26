@@ -10,6 +10,17 @@ struct CustomJSONSocketServer
   end
 end
 
+struct CustomJSONSocketServerWithComplexReponse
+  include JSONSocket::Server
+
+  def on_message(message, socket)
+    message.class.should eq(JSON::Any)
+    message["best"].as_s.should eq("no")
+    message["test"].to_s.to_i.should eq(1)
+    self.send_end_message({ error: nil, data: 138 }, socket)
+  end
+end
+
 struct CustomCyrillicJSONSocketServer
   include JSONSocket::Server
 
@@ -55,6 +66,7 @@ describe "JSONSocket::Server, JSONSocket::Client" do
     to_server = JSONSocket::Client.new("localhost", 1234)
     result = to_server.send({:test => 1})
     if result
+      p result.class
       result["status"].should eq("OK")
     end
   end
@@ -74,6 +86,17 @@ describe "JSONSocket::Server, JSONSocket::Client" do
     result = to_server.send({:test => 1})
     if result
       result["status"].should eq("OK")
+    end
+  end
+  it "Receive JSON::Any with NamedTuple" do
+    server = CustomJSONSocketServerWithComplexReponse.new("localhost", 12341)
+    spawn server.listen
+    to_server = JSONSocket::Client.new("localhost", 12341)
+    result = to_server.send({ test: 1, best: "no"})
+    if result && result["error"]? && result["data"]?
+      result.class.should eq(JSON::Any)
+      result["error"].should eq(nil)
+      result["data"].to_s.to_i.should eq(138)
     end
   end
   it "Send & receive via unix_socket with custom delimeter" do
