@@ -88,10 +88,21 @@ describe "JSONSocket::Server, JSONSocket::Client" do
       result["status"].should eq("OK")
     end
   end
-  it "Receive JSON::Any with NamedTuple" do
+  it "Receive JSON::Any with NamedTuple via tcp" do
     server = CustomJSONSocketServerWithComplexReponse.new("localhost", 12341)
     spawn server.listen
     to_server = JSONSocket::Client.new("localhost", 12341)
+    result = to_server.send({ test: 1, best: "no"})
+    if result && result["error"]? && result["data"]?
+      result.class.should eq(JSON::Any)
+      result["error"].should eq(nil)
+      result["data"].to_s.to_i.should eq(138)
+    end
+  end
+  it "Receive JSON::Any with NamedTuple via unix_socket" do
+    server = CustomJSONSocketServerWithComplexReponse.new(unix_socket: "./tmp.sock", delimeter: "µ")
+    spawn server.listen
+    to_server = JSONSocket::Client.new(unix_socket: "./tmp.sock", delimeter: "µ")
     result = to_server.send({ test: 1, best: "no"})
     if result && result["error"]? && result["data"]?
       result.class.should eq(JSON::Any)
