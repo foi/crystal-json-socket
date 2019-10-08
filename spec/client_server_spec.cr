@@ -143,7 +143,7 @@ describe "JSONSocket::Server, JSONSocket::Client" do
     server = CustomJSONSocketServerNonStop.new("localhost", 13345, "µ")
     spawn server.listen
     to_server = JSONSocket::Client.new("localhost", 13345, "µ")
-    start_time = Time.new
+    start_time = Time.local
     spawn do
       100.times do
         spawn do
@@ -159,7 +159,7 @@ describe "JSONSocket::Server, JSONSocket::Client" do
       ok = ch.receive
       i = i + 1
     end
-    end_time = Time.new
+    end_time = Time.local
     puts "result: #{end_time - start_time}"
     i.should eq(100)
   end
@@ -187,7 +187,7 @@ describe "JSONSocket::Server, JSONSocket::Client" do
     server = CustomJSONSocketServerNonStop.new(unix_socket: "./tmp-stress.sock", delimeter: "@")
     spawn server.listen
     to_server = JSONSocket::Client.new(unix_socket: "./tmp-stress.sock", delimeter: "@")
-    start_time = Time.new
+    start_time = Time.local
     spawn do
       100.times do
         spawn do
@@ -203,7 +203,7 @@ describe "JSONSocket::Server, JSONSocket::Client" do
       ok = ch.receive
       i = i + 1
     end
-    end_time = Time.new
+    end_time = Time.local
     puts "result: #{end_time - start_time}"
     i.should eq(100)
   end
