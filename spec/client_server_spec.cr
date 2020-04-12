@@ -168,7 +168,7 @@ describe "JSONSocket::Server, JSONSocket::Client" do
     server = CustomSlowJSONSocketServer.new(host: "localhost", port: 12245, delimeter: "µ")
     spawn server.listen
     to_server = JSONSocket::Client.new(host: "localhost", port: 12245, delimeter: "µ", read_timeout: 1)
-    expect_raises(IO::Timeout) do
+    expect_raises(IO::TimeoutError) do
       result = to_server.send({:hello => "ƣŲ21Ɣ"})
     end
   end
@@ -177,7 +177,7 @@ describe "JSONSocket::Server, JSONSocket::Client" do
     server = CustomSlowJSONSocketServer.new(unix_socket: "./tmp-timeout.sock", delimeter: "µ")
     spawn server.listen
     to_server = JSONSocket::Client.new(unix_socket: "./tmp-timeout.sock", delimeter: "µ", read_timeout: 1)
-    expect_raises(IO::Timeout) do
+    expect_raises(IO::TimeoutError) do
       result = to_server.send({:hello => "ƣŲ21Ɣ"})
     end
   end
