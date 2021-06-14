@@ -17,7 +17,7 @@ struct CustomJSONSocketServerWithComplexReponse
     message.class.should eq(JSON::Any)
     message["best"].as_s.should eq("no")
     message["test"].to_s.to_i.should eq(1)
-    self.send_end_message({ error: nil, data: 138 }, socket)
+    self.send_end_message({error: nil, data: 138}, socket)
   end
 end
 
@@ -92,7 +92,7 @@ describe "JSONSocket::Server, JSONSocket::Client" do
     server = CustomJSONSocketServerWithComplexReponse.new("localhost", 12341)
     spawn server.listen
     to_server = JSONSocket::Client.new("localhost", 12341)
-    result = to_server.send({ test: 1, best: "no"})
+    result = to_server.send({test: 1, best: "no"})
     if result && result["error"]? && result["data"]?
       result.class.should eq(JSON::Any)
       result["error"].should eq(nil)
@@ -103,7 +103,7 @@ describe "JSONSocket::Server, JSONSocket::Client" do
     server = CustomJSONSocketServerWithComplexReponse.new(unix_socket: "./tmp.sock", delimeter: "µ")
     spawn server.listen
     to_server = JSONSocket::Client.new(unix_socket: "./tmp.sock", delimeter: "µ")
-    result = to_server.send({ test: 1, best: "no"})
+    result = to_server.send({test: 1, best: "no"})
     if result && result["error"]? && result["data"]?
       result.class.should eq(JSON::Any)
       result["error"].should eq(nil)
