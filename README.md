@@ -1,4 +1,5 @@
-# crystal json-socket [![Build Status](https://travis-ci.org/foi/crystal-json-socket.svg?branch=master)](https://travis-ci.org/foi/crystal-json-socket)
+# crystal json-socket ![master branch](https://github.com/foi/crystal-json-socket/actions/workflows/ci.yml/badge.svg)
+
 
 JSON-socket client & server implementation. Inspired by and compatible with  [sebastianseilund/node-json-socket](https://github.com/sebastianseilund/node-json-socket/) and
 [ruby json-socket](https://github.com/foi/ruby-json-socket)
