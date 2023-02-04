@@ -70,6 +70,10 @@ module JSONSocket
       end
     end
 
+    def on_error(ex : Exception)
+      STDERR.puts ex.message
+    end
+
     def on_message(message, socket)
       puts "Default on_message methods - please override, like this: \n" \
            "class CustomJSONSocketServer \n" \
@@ -90,7 +94,7 @@ module JSONSocket
         begin
           on_message(JSON.parse(message), socket)
         rescue ex
-          STDERR.puts ex.message
+          on_error ex
         end
       end
     end
