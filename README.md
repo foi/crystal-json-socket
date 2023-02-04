@@ -30,6 +30,11 @@ struct CustomJSONSocketServer
     self.send_end_message({ :result => result}, socket)
   end
 
+  # Additionally you can define a custom on_error handler
+  def on_error(ex)
+    puts "#{ex.message}"
+  end
+
 end
 
 server = CustomJSONSocketServer.new("127.0.0.1", 1234) # OR CustomJSONSocketServer.new(unix_socket: "/tmp/json-socket-server.sock", delimeter: "µ")
